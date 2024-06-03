@@ -1,4 +1,4 @@
-package com.example.ordersys.domain.user.entity;
+package com.example.ordersys.domain.user;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -20,6 +20,9 @@ public class User {
     private String password;
 
     public static User of(String userId, String password) {
-        return new User(null, userId, password);
+        return User.builder()
+                .userId(userId)
+                .password(password)
+                .build();
     }
 }
