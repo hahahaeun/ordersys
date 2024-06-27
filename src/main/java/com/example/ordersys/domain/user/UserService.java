@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class UserService {
-
+    //repository
     private final UserRepository userRepository;
     public Long join(UserDto userdto){
         userRepository.findByUserId(userdto.userId()).ifPresent(user -> {
