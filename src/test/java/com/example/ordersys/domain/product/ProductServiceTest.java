@@ -30,6 +30,14 @@ class ProductServiceTest {
     @InjectMocks
     private ProductService productService;
 
+<<<<<<< HEAD
+=======
+//    @BeforeEach
+//    void setUp() {
+//        MockitoAnnotations.openMocks(this);
+//    }
+
+>>>>>>> origin/master
     @Test
     @DisplayName("상품 저장 테스트")
     void testProductSave() throws InterruptedException {
