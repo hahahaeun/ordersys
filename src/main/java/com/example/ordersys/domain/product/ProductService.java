@@ -1,6 +1,11 @@
 package com.example.ordersys.domain.product;
 
 import com.example.ordersys.domain.product.exception.ProductNotFoundException;
+import com.example.ordersys.domain.product.exception.SoldOutException;
+//import jakarta.persistence.EntityManager;
+//import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,15 +17,19 @@ import java.util.Optional;
 @Service
 public class ProductService {
     private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
-
+   // @PersistenceContext
+    //private EntityManager entityManager;
     private final ProductRepository productRepository;
 
-    @Transactional
-    public synchronized Product buyProduct(final int orderQuantity, final Long productId) throws Exception {
 
+
+    @Transactional
+    public synchronized Product buyProduct(final int orderQuantity, final Long productId) throws SoldOutException {
         Product product = findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException(productId));
+        //entityManager.persist(product);
         product.decreaseStock(orderQuantity);
+        //entityManager.flush();
         return product;
     }
 

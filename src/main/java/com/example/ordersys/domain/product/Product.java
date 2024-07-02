@@ -1,10 +1,7 @@
 package com.example.ordersys.domain.product;
 
 import com.example.ordersys.domain.product.exception.SoldOutException;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,6 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Product {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "name", nullable = false)
