@@ -7,5 +7,5 @@ public interface ProductRepository {
 
     Product save(Product product);
 
-
+    Optional<Product> findByIdForUpdate(Long productId);
 }

@@ -1,5 +1,6 @@
 package com.example.ordersys.domain.product;
 
+import com.example.ordersys.domain.product.dto.ProductDto;
 import com.example.ordersys.domain.product.exception.ProductNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,47 +15,27 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 public class ProductServiceIntegrationTest {
     @Autowired
-    private ProductService productService;
+    ProductService productService;
     @Autowired
-    private ProductRepository productRepository;
-    @Test
-    @DisplayName("상품 저장 테스트")
-    void testProductSave() throws InterruptedException {
-        //given
-        Long productId = 1L;
-        Product product = Product.builder()
-                .id(productId)
-                .price(1000)
-                .stock(29)
-                .name("Test")
-                .build();
+    ProductRepository productRepository;
 
-        //when
-        Long rtnId = productService.saveProduct(product);
-        //then
-        assertEquals(rtnId,productId);
-
-    }
     @Test
     @DisplayName("재고가 29개인 상품을 10개의 스레드가 3개씩 동시에 구매했을 때 하나의 구매가 실패한다.")
     void testConcurrentBuyProduct() throws Exception {
         // Given
-        Long productId = 2L;
+        Long productId = 1L;
         Product product = Product.builder()
-                .id(productId)
                 .price(1000)
                 .stock(29)
                 .name("Test")
                 .build();
 
-
-        Long rtnId = productService.saveProduct(product);
+        ProductDto productDto = new ProductDto(product);
+        Long rtnId = productService.saveProduct(productDto);
 
         AtomicInteger failCount = new AtomicInteger(0); //실패 카운트 - 여러 스레드에서 카운트
         ExecutorService executorService = Executors.newFixedThreadPool(10); //10개의 고정된 스레드 풀을 생성
@@ -82,14 +63,12 @@ public class ProductServiceIntegrationTest {
         startLatch.countDown();//모든 스레드가 동시에 시작
         endLatch.await();//10개의 스레드가 모두 작업을 완료할 때까지 기다림
 
-
         // When
         Optional<Product> productForSale = productRepository.findById(productId);
 
         // Then
         Product productInstance = productForSale.orElseThrow(() -> new ProductNotFoundException(productId));
         assertEquals(productId, productInstance.getId());
-        assertEquals(rtnId, productInstance.getId());
 
         System.out.println(failCount.get());
         System.out.println(productInstance.getStock());

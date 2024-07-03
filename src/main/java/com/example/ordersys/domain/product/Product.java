@@ -26,6 +26,7 @@ public class Product {
     @Column(name = "stock", nullable = false)
     private int stock;
 
+
     public Product(Long id, String name, int price, int stock){
         this.id = id;
         this.name = name;

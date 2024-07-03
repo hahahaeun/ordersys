@@ -1,5 +1,6 @@
 package com.example.ordersys.domain.product;
 
+import com.example.ordersys.domain.product.dto.ProductDto;
 import com.example.ordersys.domain.product.exception.ProductNotFoundException;
 import com.example.ordersys.domain.product.exception.SoldOutException;
 //import jakarta.persistence.EntityManager;
@@ -17,8 +18,10 @@ import java.util.Optional;
 @Service
 public class ProductService {
     private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
-   // @PersistenceContext
-    //private EntityManager entityManager;
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
     private final ProductRepository productRepository;
 
 
@@ -27,9 +30,9 @@ public class ProductService {
     public synchronized Product buyProduct(final int orderQuantity, final Long productId) throws SoldOutException {
         Product product = findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException(productId));
-        //entityManager.persist(product);
+
         product.decreaseStock(orderQuantity);
-        //entityManager.flush();
+        entityManager.flush();
         return product;
     }
 
@@ -39,8 +42,15 @@ public class ProductService {
         return productRepository.findById(productId);
     }
 
+    //비관적락을 사용
+    @Transactional(readOnly = true)
+    public Optional<Product> findByIdForUpdate(final Long productId){
+        return productRepository.findByIdForUpdate(productId);
+    }
+
     @Transactional
-    public Long saveProduct(final Product product) {
+    public Long saveProduct(ProductDto productDto) {
+        Product product = productDto.toEntity();
         Product newProduct = productRepository.save(product);
         return newProduct.getId();
     }
